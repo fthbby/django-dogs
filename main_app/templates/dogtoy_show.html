@@ -5,10 +5,13 @@
 
 <div>
     <div>
+        <img src='{{dogtoy.img}}' alt = '{{dogtoy.name}}'/>
+        <br>
         <span>{{ dogtoy.name }}</span>
         <p>Color: {{ dogtoy.color }}</p>
     </div>
     <div>
+        
         <a href="{% url 'dogtoys_update' dogtoy.id %}">Edit</a>
         <a href="{% url 'dogtoys_delete' dogtoy.id %}">Delete</a>
     </div>
