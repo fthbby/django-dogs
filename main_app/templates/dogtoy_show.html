@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Dog Toy Details</h1>
+
+<div>
+    <div>
+        <span>{{ dogtoy.name }}</span>
+        <p>Color: {{ dogtoy.color }}</p>
+    </div>
+    <div>
+        <a href="{% url 'dogtoys_update' dogtoy.id %}">Edit</a>
+        <a href="{% url 'dogtoys_delete' dogtoy.id %}">Delete</a>
+    </div>
+        <h2>Owned by:</h2>
+        {% for dog in dogtoy.dog_set.all %}
+            <p>{{dog.name}}</p>
+        {% empty %}
+            <p>Nobody Has This Toy</p>
+        {% endfor %}
+
+
+</div>
+
+{% endblock %}

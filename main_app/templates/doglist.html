@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dog List
+{% endblock %}
+
+{% block content %}
+
+<form>
+    <div>
+        <input type="text" name="name" placeholder="name"/>
+        <input type="submit" value="Search"/>
+    </div>
+    <a href="{% url 'dog_list' %}">Clear Search</a>
+
+    <a href="{% url 'dog_create' %}">Add Cat</a>
+</form>
+
+
+
+<h1>{{header}}</h1>
+      {% for dog in dogs %}
+    <img src='{{dog.img}}' alt = '{{dog.name}}'/>
+
+    <a href="{% url 'dog_detail' dog.pk %}">
+        <h3>{{dog.name}}</h3>
+    </a>
+    <h3>Name: {{dog.name}}</h3>
+    <h3>Age: {{dog.age}}</h3>
+    <h3>Gender: {{dog.gender}}</h3>
+
+    <p> adopted by:
+        <a href ='/user/{{ dog.user.username }}'> {{ dog.user.username }}</a>
+    </p>
+
+    {% endfor %}
+{% endblock %}
+
+<!-- 
+{% block potato %}
+<h1> Hello</h1>
+{% endblock %} -->
+

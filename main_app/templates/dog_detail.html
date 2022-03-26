@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div>
+    <img src='{{dog.img}}' alt = '{{dog.name}}'/>
+</div>
+
+<div>
+    <h1>{{dog.name}}</h1>
+
+    <h3>Age: {{dog.age}} </h3>
+    <h3>Gender: {{dog.gender}} </h3>
+    <p> adopted by:
+        <a href ='/user/{{ dog.user.username }}'> {{ dog.user.username }}</a>
+    </p>
+
+    <h3> Toys Owned:</h3>
+    {% for dogtoy in dog.dogtoys.all %}
+        <div>{{ dogtoy.name }} </div>
+    {% empty %}
+        <div> {{dog.name}} has no toys 🥹</div>
+    {% endfor %}
+
+</div>
+
+<div>
+    <a href="{% url 'dog_update' dog.pk %}">Update</a>
+    <a href="{% url 'dog_delete' dog.pk %}">Delete</a>
+
+
+</div>
+
+{% endblock %}
+

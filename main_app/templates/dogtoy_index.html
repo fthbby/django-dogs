@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1>DOg Toy list</h1>
+    <h2> {{header}}</h2>
+
+    {% for dogtoy in dogtoys %}
+        <div>
+            <a href = "{% url 'dogtoys_show' dogtoy.id %}">
+                <div class="card-content">
+                    <span> {{ dogtoy.name }} </span>
+                    <p> Color: {{ dogtoy.color }} </p>
+                </div>
+
+            </a>
+
+        </div>
+
+        <hr/>
+
+
+    {% endfor %}
+
+{% endblock%}
