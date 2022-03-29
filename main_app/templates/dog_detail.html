@@ -17,6 +17,7 @@
     <h3> Toys Owned:</h3>
     {% for dogtoy in dog.dogtoys.all %}
         <div>{{ dogtoy.name }} </div>
+        <div><img src='{{ dogtoy.img }}'/></div>
     {% empty %}
         <div> {{dog.name}} has no toys 🥹</div>
     {% endfor %}

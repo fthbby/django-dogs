@@ -8,6 +8,11 @@ from django.views.generic import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.http import HttpResponse, HttpResponseRedirect #this is our responses
 
 
 # Create your views here.
@@ -50,14 +55,19 @@ class Dog_List(TemplateView):
             context['header'] = "Our Dogs"
         return context
 
-
+@method_decorator(login_required, name = 'dispatch')
 class Dog_Create(CreateView):
     model = Dog
     fields = ['name', 'img', 'age', 'gender', 'dogtoys', 'user']
     template_name = 'dog_create.html'
-    success_url = '/dogs/'
-    def get_success_url(self):
-        return reverse('dog_detail', kwargs={'pk': self.object.pk})
+    # success_url = '/dogs/'
+    # def get_success_url(self):
+    #     return reverse('dog_detail', kwargs={'pk': self.object.pk})
+    def form_valid(self, form):
+        self.object = form.save(commit = False)
+        self.object.user = self.request.user
+        self.object.save()
+        return HttpResponseRedirect('/dogs')
 
 
 
@@ -66,6 +76,7 @@ class Dog_Detail(DetailView):
     template_name = 'dog_detail.html'
 
 
+@method_decorator(login_required, name = 'dispatch')
 class Dog_Update(UpdateView):
     model = Dog
     fields = ['name', 'img', 'age', 'gender', 'dogtoys']
@@ -75,6 +86,7 @@ class Dog_Update(UpdateView):
         return reverse('dog_detail', kwargs={'pk': self.object.pk})
 
 
+@method_decorator(login_required, name = 'dispatch')
 class Dog_Delete(DeleteView):
     model = Dog
     template_name = 'dog_delete_confirmation.html'
@@ -82,6 +94,7 @@ class Dog_Delete(DeleteView):
 
 
 # Profile for the user
+@login_required
 def profile(request, username):
     user = User.objects.get(username = username)
     # user = User.objects.get(username = 'romebell')
@@ -99,19 +112,72 @@ def dogtoys_show(request, dogtoy_id):
     dogtoy = DogToy.objects.get(id=dogtoy_id)
     return render(request, 'dogtoy_show.html', {'dogtoy': dogtoy})
 
+@method_decorator(login_required, name = 'dispatch')
 class DogToyCreate(CreateView):
     model = DogToy
     fields = '__all__'
     template_name = "dogtoy_form.html"
     success_url = '/dogtoys'
 
+@method_decorator(login_required, name = 'dispatch')
 class DogToyUpdate(UpdateView):
     model = DogToy
     fields = ['name', 'color']
     template_name = "dogtoy_update.html"
     success_url = '/dogtoys'
 
+@method_decorator(login_required, name = 'dispatch')
 class DogToyDelete(DeleteView):
     model = DogToy
     template_name = "dogtoy_confirm_delete.html"
     success_url = '/dogtoys'
+
+
+
+# Login, Logout and Signup
+def login_view(request):
+    # if POST, then authenticate the user (submitting the username and password)
+    if request.method == 'POST':
+        form = AuthenticationForm(request, request.POST)
+        if form.is_valid():
+            u = form.cleaned_data['username']
+            p = form.cleaned_data['password']
+            user = authenticate(username = u, password = p)
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    return HttpResponseRedirect('/user/' +u)
+                else:
+                    print('The account has been disabled')
+                    # feel free to redirect them somewhere
+                    return HttpResponseRedirect('/login') #can change this
+            else:
+                print('The username and/or password is incorrect')
+                return HttpResponseRedirect('/login') #can change this
+
+    else:
+        #user is going to the login page
+        form = AuthenticationForm()
+        return render(request, 'login.html', {'form': form})
+
+
+
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect('/dogs')
+
+
+def signup_view(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            print('HEY', user.username)
+            return HttpResponseRedirect('/user/'+str(user))
+        else:
+            HttpResponse('<h1>Try Again</h1>')
+            return HttpResponseRedirect('/signup') #can change this
+    else:
+        form = UserCreationForm()
+        return render(request, 'signup.html', {'form': form})

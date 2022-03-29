@@ -30,5 +30,9 @@ urlpatterns = [
     path('dogtoys/<int:pk>/update/', views.DogToyUpdate.as_view(), name='dogtoys_update'),
 
     path('dogtoys/<int:pk>/delete/', views.DogToyDelete.as_view(), name='dogtoys_delete'),
+
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('signup/', views.signup_view, name='signup'),
 ]
 
